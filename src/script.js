@@ -5,38 +5,49 @@
 
 const buttons = /** @type {NodeListOf<HTMLElement>} */ (document.querySelectorAll('.btn'));
 const white = /** @type {HTMLElement} */ (document.querySelector('.white'));
-const none = /** @type {HTMLElement} */ (document.querySelector('.none'));
+// const none = /** @type {HTMLElement} */ (document.querySelector('.none'));
 const question = /** @type {HTMLElement} */ (document.querySelector('.que'));
 const comm = /** @type {HTMLElement} */ (document.querySelector('.comm'));
 const start = /** @type {HTMLElement} */ (document.querySelector('.start'));
-const startButton = /** @type {HTMLElement} */ (document.querySelector('.start-button'));
 const end = /** @type {HTMLElement} */ (document.querySelector('.end'));
+const retry = /** @type {HTMLElement} */ (document.querySelector('.retry'));
+const retryBtn = /** @type {HTMLElement} */ (document.querySelector('.retry-button'));
+
+const startButton = /** @type {HTMLElement} */ (document.querySelector('.start-button'));
 const error = /** @type {HTMLElement} */ (document.querySelector('.error'));
 
 const videoNode = /** @type {HTMLVideoElement} */ (document.querySelector('video.video'));
 const videoSource = document.createElement('source');
 
-let changed = 0;
+const answ = [1, 0];
 
-/** Youtube video ids */
+// let started = 1;
+// let changed = 0;
+// let states = [];
+
+// let timeout;
+
 const ytVideos = [
   // prettier-ignore
-  '3ZyiYJ1Ashc',
-  'DtrK8e03Ri0',
-  '6twkdANujAo',
-  'JI1t4ocnceM',
+  'mNt2x9hvGdk',
+  ['yLkM1LKYR28', '6aI2Fes3FzM'],
+  ['t8UVVvpWebo', 'kl8xRRLB0ew'],
 ];
+const firstYtVideoId = /** @type {string} */ (ytVideos[0]);
 
 /** Local video files */
 const localVideos = [
   // Local videos,,,
   'videos/1.mp4',
-  'videos/2.mp4',
-  'videos/3.mp4',
-  'videos/4.mp4',
+  ['videos/2.mp4', 'videos/3.mp4'],
+  ['videos/4.mp4', 'videos/5.mp4'],
 ];
 
 let level = 0;
+let target = null;
+let counter = null;
+
+let answer = null;
 
 /** @type {InstanceType<typeof window.YT.Player>} */
 let ytPlayer;
@@ -96,13 +107,31 @@ function initPlayer() {
   });
 }
 
+function findCounter() {
+  counter = null;
+  for (let i = 0; i < buttons.length; i++) {
+    if (buttons[i] == target) {
+      counter = i;
+    }
+  }
+}
+
+function checkAnswer() {
+  answer = null;
+  if (answ[level - 1] == counter) {
+    answer = true;
+  } else {
+    answer = false;
+  }
+}
+
 /** @param {MouseEvent} ev */
 function main(ev) {
   const eventTarget = /** @type {HTMLElement} */ (ev.target);
   console.log('[main]', {
     eventTarget,
   });
-  if (eventTarget.classList.contains('start-button')) {
+  if (/* started == 1 && */ eventTarget.classList.contains('start-button')) {
     console.log('[main] start-button');
     playVideo();
     noOp(start);
@@ -110,15 +139,24 @@ function main(ev) {
     console.log('[main] end (reload)');
     location.reload();
   } else if (findTarget(ev)) {
-    console.log('[main] other');
-    if (changed == 0) {
-      changed = 1;
-      changeLevel();
-      changeVideo();
-      playVideo();
-    }
+    console.log('[main] initial (???)');
+    // clearTimeout(timeout);
+    // changed = 1;
+    changeLevel('+');
+    findCounter();
+    checkAnswer();
+    changeVideo();
+    playVideo();
     replayVideo();
     noOp(white);
+  } else if (eventTarget == retryBtn) {
+    console.log('[main] final (retry)');
+    // clearTimeout(timeout);
+    // changed = 0;
+    changeLevel('-');
+    changeTexts();
+    show(white);
+    hide(retry);
   } else {
     console.log('[main] else (???)');
     return false;
@@ -142,22 +180,55 @@ function show(tar) {
 
 function playerChange() {
   const state = ytPlayer.getPlayerState();
-  if (state === 0) {
-    handleVideoEnd();
-  } else if (state === 1) {
-    show(none);
-    // playVideo();
+  console.log('[playerChange]', {
+    state,
+  });
+  // states.push(state);
+  // if (states.length == 3) {
+  //   started = 1;
+  // }
+  if (state == 0) {
+    return handleVideoEnd();
+  } else if (state == 1) {
+    // show(none);
+    // player.playVideo();
   }
 }
 
-/** @param {MouseEvent} ev */
-function findTarget(ev) {
-  const eventTarget = /** @type {HTMLElement} */ (ev.target);
-  if (eventTarget.classList.contains('btn')) {
+function findTarget(e) {
+  target = null;
+  if (e.target.classList.contains('btn')) {
+    target = e.target;
     return true;
   } else {
     return false;
   }
+}
+
+function getYoutubeVideoId() {
+  let result = ytVideos[level];
+  if (Array.isArray(result)) {
+    result = result[counter];
+  }
+  console.log('[getYoutubeVideoId]', {
+    result,
+    level,
+    counter,
+  });
+  return result;
+}
+
+function getLocalVideoUrl() {
+  let result = localVideos[level];
+  if (Array.isArray(result)) {
+    result = result[counter];
+  }
+  console.log('[getYoutubeVideoId]', {
+    result,
+    level,
+    counter,
+  });
+  return result;
 }
 
 function changeVideo() {
@@ -166,25 +237,38 @@ function changeVideo() {
     level,
   });
   if (useLocalVideo) {
-    const videoUrl = localVideos[level];
+    const videoUrl = getLocalVideoUrl();
     console.log('[changeVideo] local', {
       videoUrl,
     });
+    if (!videoUrl) {
+      return false;
+    }
     videoSource.setAttribute('src', videoUrl);
     videoNode.load();
   } else {
-    const videoId = ytVideos[level];
+    const videoId = getYoutubeVideoId();
     console.log('[changeVideo] youtube', {
       videoId,
     });
+    if (!videoId) {
+      return false;
+    }
     ytPlayer.loadVideoById(videoId);
   }
   return true;
 }
 
-function changeLevel() {
-  level++;
-  return true;
+/** @param {'+'|'-'} direction */
+function changeLevel(direction) {
+  switch (direction) {
+    case '+':
+      level++;
+      break;
+    case '-':
+      level--;
+      break;
+  }
 }
 
 function changeQuestion() {
@@ -193,9 +277,10 @@ function changeQuestion() {
 }
 
 function changeAnswers() {
-  for (let i = 0; i < buttons.length; i++) {
-    buttons[i].innerText = answers[level][i];
-    buttons[i].classList.toggle('selected', false);
+  if (answers[level]) {
+    for (let i = 0; i < buttons.length; i++) {
+      buttons[i].innerHTML = answers[level][i];
+    }
   }
 }
 
@@ -226,11 +311,18 @@ function checkFinish() {
 }
 
 function handleVideoEnd() {
-  console.log('[handleVideoEnd]');
-  changed = 0;
-  checkComm();
-  checkFinish();
-  show(white);
+  console.log('[handleVideoEnd]', {
+    answer,
+  });
+  if (answer == false) {
+    show(retry);
+    return true;
+  } else {
+    // changed = 0;
+    checkComm();
+    checkFinish();
+    show(white);
+  }
 }
 
 /** @param {ErrorEvent} ev */
@@ -250,8 +342,11 @@ function handleVideoError(ev) {
 // eslint-disable-next-line no-unused-vars
 function onYouTubePlayerAPIReady() {
   ytPlayer = new window.YT.Player('ytplayer', {
-    videoId: ytVideos[0],
-    playerVars: { controls: 0, showinfo: 0 },
+    videoId: firstYtVideoId,
+    playerVars: {
+      // controls: 0,
+      showinfo: 0,
+    },
     events: {
       onStateChange: playerChange,
       onReady: initPlayer,
@@ -286,3 +381,5 @@ if (useLocalVideo) {
 } else {
   window.addEventListener('load', onYoutubePlayerReady);
 }
+
+document.addEventListener('click', main);

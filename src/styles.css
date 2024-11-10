@@ -15,7 +15,7 @@ html {
   font-family: Ubuntu, sans-serif;
 }
 
-.video,
+,
 .player {
   position: relative;
   width: 100%;
@@ -23,6 +23,8 @@ html {
 }
 
 .white {
+  -webkit-transition: opacity 1s ease-in-out;
+  -o-transition: opacity 1s ease-in-out;
   transition: opacity 1s ease-in-out;
   position: absolute;
   top: 0;
@@ -31,7 +33,7 @@ html {
   height: 100%;
   z-index: 10;
   display: -webkit-box;
-  display: flexbox;
+  display: -ms-flexbox;
   display: flex;
   /* flex-direction: column; */
   -webkit-box-pack: center;
@@ -44,12 +46,16 @@ html {
 }
 
 .question {
-  max-width: 75%;
+  width: 75%;
   border-radius: 16px;
   padding: 26px;
   background-color: #ccd0e2;
   font-weight: bold;
   text-align: center;
+}
+
+.cont {
+  max-width: 75%;
 }
 
 .comm {
@@ -63,7 +69,7 @@ html {
 .horisontal {
   height: 45%;
   display: -webkit-box;
-  display: flexbox;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: space-evenly;
   -ms-flex-pack: space-evenly;
@@ -74,17 +80,25 @@ html {
 }
 
 .horisontal:nth-child(2) {
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
+  -webkit-box-align: stretch;
+  -ms-flex-align: stretch;
+  align-items: stretch;
   -webkit-box-pack: center;
   -ms-flex-pack: center;
   justify-content: center;
-  height: 40%;
+  /* max-width: 90%; */
+  height: auto;
+  margin-top: 30px;
   gap: 20px;
 }
 
 .btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   user-select: none;
   padding: 10px 16px;
   background-color: #fff;
@@ -95,6 +109,12 @@ html {
   min-width: 80px;
   margin: 0 10px;
   text-align: center;
+  -webkit-transition:
+    background-color 0.5s,
+    border-color 0.5s;
+  -o-transition:
+    background-color 0.5s,
+    border-color 0.5s;
   transition:
     background-color 0.5s,
     border-color 0.5s;
@@ -107,6 +127,8 @@ html {
 }
 
 .start {
+  -webkit-transition: opacity 1s ease-out;
+  -o-transition: opacity 1s ease-out;
   transition: opacity 1s ease-out;
   position: absolute;
   top: 0;
@@ -114,7 +136,7 @@ html {
   width: 100%;
   height: 100%;
   display: -webkit-box;
-  display: flexbox;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: center;
   -ms-flex-pack: center;
@@ -128,6 +150,8 @@ html {
 .error,
 .end {
   z-index: 11;
+  -webkit-transition: opacity 1s ease-out;
+  -o-transition: opacity 1s ease-out;
   transition: opacity 1s ease-out;
   position: absolute;
   top: 0;
@@ -135,7 +159,7 @@ html {
   width: 100%;
   height: 100%;
   display: -webkit-box;
-  display: flexbox;
+  display: -ms-flexbox;
   display: flex;
   -webkit-box-pack: center;
   -ms-flex-pack: center;
@@ -148,6 +172,9 @@ html {
 
 .start-button {
   font-size: 20px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   user-select: none;
   padding: 24px 30px;
   background-color: #fff;
@@ -158,6 +185,12 @@ html {
   min-width: 80px;
   margin: 0 10px;
   text-align: center;
+  -webkit-transition:
+    background-color 0.5s,
+    border-color 0.5s;
+  -o-transition:
+    background-color 0.5s,
+    border-color 0.5s;
   transition:
     background-color 0.5s,
     border-color 0.5s;
@@ -169,8 +202,33 @@ html {
   border-color: #0ff;
 }
 
-.end-button {
+.retry {
+  z-index: 11;
+  -webkit-transition: opacity 1s ease-out;
+  -o-transition: opacity 1s ease-out;
+  transition: opacity 1s ease-out;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  background-color: #ebffff;
+}
+
+.retry-button {
   font-size: 20px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
   user-select: none;
   padding: 24px 30px;
   background-color: #fff;
@@ -181,6 +239,44 @@ html {
   min-width: 80px;
   margin: 0 10px;
   text-align: center;
+  -webkit-transition:
+    background-color 0.5s,
+    border-color 0.5s;
+  -o-transition:
+    background-color 0.5s,
+    border-color 0.5s;
+  transition:
+    background-color 0.5s,
+    border-color 0.5s;
+}
+
+.retry-button:hover {
+  cursor: pointer;
+  background-color: #e6fefe;
+  border-color: #0ff;
+}
+
+.end-button {
+  font-size: 20px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  padding: 24px 30px;
+  background-color: #fff;
+  border: 4px solid #a4ffff;
+  color: rgb(0 0 0);
+  font-weight: bold;
+  border-radius: 50px;
+  min-width: 80px;
+  margin: 0 10px;
+  text-align: center;
+  -webkit-transition:
+    background-color 0.5s,
+    border-color 0.5s;
+  -o-transition:
+    background-color 0.5s,
+    border-color 0.5s;
   transition:
     background-color 0.5s,
     border-color 0.5s;
